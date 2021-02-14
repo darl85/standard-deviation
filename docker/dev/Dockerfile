@@ -8,6 +8,8 @@ ADD . $APP_HOME
 
 WORKDIR $APP_HOME
 
+RUN go mod vendor
+
 EXPOSE 8080
 
 CMD ["go", "run", "src/main.go"]

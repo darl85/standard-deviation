@@ -7,7 +7,8 @@ RUN apk add --no-cache git
 WORKDIR /go/standard-deviation/
 ADD . /go/standard-deviation/
 
-RUN go build -o /go/standard-deviation/srv ./src
+RUN go mod vendor \
+    && go build -o /go/standard-deviation/srv ./src
 
 WORKDIR /go/src/
 RUN go get github.com/go-delve/delve/cmd/dlv

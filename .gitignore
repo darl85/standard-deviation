@@ -12,6 +12,11 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 build
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/standard-deviation.iml
+/.idea/vcs.xml

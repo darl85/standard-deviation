@@ -4,7 +4,13 @@ import (
 	"math"
 )
 
-func calculateStandardDeviation(numberSet []int) float64 {
+type standardDeviationCalculator struct{}
+
+type calculateStandardDeviationInterface interface {
+	calculateStandardDeviation(numberSet []int) float64
+}
+
+func (calculator *standardDeviationCalculator) calculateStandardDeviation(numberSet []int) float64 {
 	var sum, mean, powSum float64
 	setLength := float64(len(numberSet))
 
@@ -19,3 +25,5 @@ func calculateStandardDeviation(numberSet []int) float64 {
 
 	return math.Sqrt(powSum / setLength)
 }
+
+var StandardDeviationCalculator = standardDeviationCalculator{}

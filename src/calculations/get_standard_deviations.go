@@ -2,13 +2,13 @@ package calculations
 
 import "standard-deviation/src/handler"
 
-func GetStandardDeviations(numberSets [][]int) []handler.StandardDeviation {
+func GetStandardDeviations(numberSets [][]int, calculate calculateStandardDeviationInterface) []handler.StandardDeviation {
 	var deviations []handler.StandardDeviation
 	var numbersSum []int
 
 	for _, numberSet := range numberSets {
 		deviations = append(deviations, handler.StandardDeviation{
-			StdDev: 0,
+			StdDev: calculate.calculateStandardDeviation(numberSet),
 			Data: numberSet,
 		})
 
@@ -16,7 +16,7 @@ func GetStandardDeviations(numberSets [][]int) []handler.StandardDeviation {
 	}
 
 	sumDeviation := handler.StandardDeviation{
-		StdDev: 0,
+		StdDev: calculate.calculateStandardDeviation(numbersSum),
 		Data:   numbersSum,
 	}
 

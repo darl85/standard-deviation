@@ -1,4 +1,4 @@
-FROM golang:1.15.8-alpine3.13
+FROM golang:1.15.8
 
 ENV GO111MODULE=on
 ENV GOFLAGS=-mod=vendor

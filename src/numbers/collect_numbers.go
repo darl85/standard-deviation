@@ -2,21 +2,29 @@ package numbers
 
 import (
 	"context"
-	"standard-deviation/src/random_api"
 	"sync"
 )
+
+type ClientErrorInterface interface {
+	Error() string
+	GetCode() int
+}
+
+type RandomApiClientInterface interface {
+	GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, interface{ClientErrorInterface})
+}
 
 func CollectNumberSets(
 	requests int,
 	numberOfIntegers int,
-	randomApiClient random_api.RandomApiClientInterface,
+	randomApiClient RandomApiClientInterface,
 ) (
 	[][]int,
-	random_api.ClientErrorInterface,
+	ClientErrorInterface,
 ) {
 	var apiResponseWaitGroup sync.WaitGroup
 	var numbersSetsCollection [][]int
-	var apiError random_api.ClientErrorInterface
+	var apiError ClientErrorInterface
 
 	randomApiContext, cancel := context.WithCancel(context.Background())
 

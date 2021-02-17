@@ -20,17 +20,21 @@ func meanHandler(writer http.ResponseWriter, request *http.Request) {
                 Code:    assertErr.GetCode(),
                 Message: assertErr.Error(),
             })
+        } else {
+            handler.HandleUnexpectedErrorResponse(writer)
         }
         return
     }
 
     numberSetsCollection, collectNumberError := numbers.CollectNumberSets(requests, numberOfIntegers, random_api.RandomApiClient)
     if collectNumberError != nil {
-        if assertcollectNumberError, ok := collectNumberError.(*random_api.ClientError); ok {
+        if assertCollectNumberError, ok := collectNumberError.(*random_api.ClientError); ok {
             handler.HandleErrorResponse(writer, &handler.ErrorResponse{
-                Code:    assertcollectNumberError.GetCode(),
-                Message: assertcollectNumberError.Error(),
+                Code:    assertCollectNumberError.GetCode(),
+                Message: assertCollectNumberError.Error(),
             })
+        } else {
+            handler.HandleUnexpectedErrorResponse(writer)
         }
         return
     }

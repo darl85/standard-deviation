@@ -52,13 +52,18 @@ func TestNumberSetsCollectingFailFromClient(t *testing.T) {
 func TestNumberSetsCollectingFailOnTimeout(t *testing.T) {
 	numOfRequests := 2
 	numOfIntegers := 3
-	randomApiMock := new(randomApiClientMock)
 
-	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Duration(time.Microsecond*1))
+	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, &fakedClient{}, time.Duration(time.Microsecond*1))
 
 	assert.Nil(t, result)
 	assert.NotNil(t, apiError)
 	assert.Equal(t, "Reqeust timeout exceeded:", apiError.Error())
+}
+
+type fakedClient struct {}
+
+func (client *fakedClient) GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, error) {
+	return nil, nil
 }
 
 type randomApiClientMock struct {

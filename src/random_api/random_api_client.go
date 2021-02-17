@@ -3,14 +3,14 @@ package random_api
 import (
 	"github.com/ybbus/jsonrpc/v2"
 	"net/http"
+	"os"
 )
 
 var (
-	// TODO handle params via .env
-	rpcClientInstance = jsonrpc.NewClient("https://api.random.org/json-rpc/2/invoke")
+	rpcClientInstance = jsonrpc.NewClient(os.Getenv("RANDOM_API_ADDRESS"))
 	RandomApiClient = &randomApiClient{
 		rpcClientInstance,
-		"7033c3d0-1314-4f3e-9cf5-7944e992ac9f",
+		os.Getenv("RANDOM_API_KEY"),
 	}
 )
 

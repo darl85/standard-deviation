@@ -20,3 +20,5 @@ build
 /.idea/modules.xml
 /.idea/standard-deviation.iml
 /.idea/vcs.xml
+
+.env.local

@@ -2,7 +2,20 @@ package numbers
 
 import (
 	"context"
+	"net/http"
 )
+
+type CollectingNumbersError struct {
+	code    int
+	message string
+}
+
+func (timeoutError *CollectingNumbersError) Error() string {
+	return timeoutError.message
+}
+func (timeoutError *CollectingNumbersError) GetCode() int {
+	return timeoutError.code
+}
 
 func getNumbersSet(
 	randomApiContext context.Context,
@@ -11,7 +24,10 @@ func getNumbersSet(
 ) ([]int, error) {
 	select {
 		case <- randomApiContext.Done():
-			return nil, nil
+			return nil, &CollectingNumbersError{
+				code:    http.StatusRequestTimeout,
+				message: "Reqeust timeout exceeded:",
+			}
 		default:
 	}
 

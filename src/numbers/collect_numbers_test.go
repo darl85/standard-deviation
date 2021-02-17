@@ -3,7 +3,9 @@ package numbers
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"standard-deviation/src/random_api"
 	"testing"
+	"time"
 )
 
 func TestNumberSetsCollecting(t *testing.T) {
@@ -17,7 +19,7 @@ func TestNumberSetsCollecting(t *testing.T) {
 	randomApiMock.On("GetRandomIntegers", numOfIntegers, 1, 100).Return(responseNumberSets[0], nil).Once()
 	randomApiMock.On("GetRandomIntegers", numOfIntegers, 1, 100).Return(responseNumberSets[1], nil).Once()
 
-	result, _ := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock)
+	result, _ := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Duration(time.Second*30))
 
 	assert.Equal(t, responseNumberSets, result)
 }
@@ -35,22 +37,28 @@ func TestNumberSetsCollectingFailFromClient(t *testing.T) {
 	).Once()
 	randomApiMock.On("GetRandomIntegers", numOfIntegers, 1, 100).Return(
 		nil,
-		&ClientError{},
+		&random_api.ClientError{
+			Code: 123,
+			Message: "Some msg",
+		},
 	).Once()
 
-	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock)
+	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Duration(time.Second*30))
 
 	assert.Nil(t, result)
 	assert.NotNil(t, apiError)
 }
 
+func TestNumberSetsCollectingFailOnTimeout(t *testing.T) {
+	numOfRequests := 2
+	numOfIntegers := 3
+	randomApiMock := new(randomApiClientMock)
 
-type ClientError struct {}
-func (clientErr *ClientError) Error () string {
-	return "some error"
-}
-func (clientErr *ClientError) GetCode () int {
-	return 666
+	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Duration(time.Microsecond*1))
+
+	assert.Nil(t, result)
+	assert.NotNil(t, apiError)
+	assert.Equal(t, "Reqeust timeout exceeded:", apiError.Error())
 }
 
 type randomApiClientMock struct {

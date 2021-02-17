@@ -7,7 +7,10 @@ import (
     "standard-deviation/src/handler"
     "standard-deviation/src/numbers"
     "standard-deviation/src/random_api"
+    "time"
 )
+
+const timeout = time.Duration(time.Second*30)
 
 func meanHandler(writer http.ResponseWriter, request *http.Request) {
     writer.Header().Set("Content-Type", "application/json")
@@ -26,9 +29,14 @@ func meanHandler(writer http.ResponseWriter, request *http.Request) {
         return
     }
 
-    numberSetsCollection, collectNumberError := numbers.CollectNumberSets(requests, numberOfIntegers, random_api.RandomApiClient)
+    numberSetsCollection, collectNumberError := numbers.CollectNumberSets(
+        requests,
+        numberOfIntegers,
+        random_api.RandomApiClient,
+        timeout,
+    )
     if collectNumberError != nil {
-        if assertCollectNumberError, ok := collectNumberError.(*random_api.ClientError); ok {
+        if assertCollectNumberError, ok := collectNumberError.(*numbers.CollectingNumbersError); ok {
             handler.HandleErrorResponse(writer, &handler.ErrorResponse{
                 Code:    assertCollectNumberError.GetCode(),
                 Message: assertCollectNumberError.Error(),

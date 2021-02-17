@@ -22,13 +22,13 @@ func TestHandleQueryParametersExtraction(t *testing.T) {
 	assert.Equal(t, convertedLength, length)
 }
 
-func TestReturningErrorOnInConversion(t *testing.T) {
+func TestReturningErrorOnConversion(t *testing.T) {
 	request := prepareRequest("str", "str")
 
 	_, _, handlerError := HandleQueryParameters(request)
 
-	assert.Equal(t, http.StatusBadRequest, handlerError.Code)
-	assert.Equal(t, "Parameters are invalid, pass integers for both params", handlerError.Message)
+	assert.Equal(t, http.StatusBadRequest, handlerError.GetCode())
+	assert.Equal(t, "Parameters are invalid, pass integers for both params", handlerError.Error())
 }
 
 func TestReturningErrorOnNegativeParamValue(t *testing.T) {
@@ -36,8 +36,8 @@ func TestReturningErrorOnNegativeParamValue(t *testing.T) {
 
 	_, _, handlerError := HandleQueryParameters(request)
 
-	assert.Equal(t, http.StatusBadRequest, handlerError.Code)
-	assert.Equal(t, "Parameters cannot be negative", handlerError.Message)
+	assert.Equal(t, http.StatusBadRequest, handlerError.GetCode())
+	assert.Equal(t, "Parameters cannot be negative", handlerError.Error())
 }
 
 func prepareRequest(requestsParam string, lengthParam string) *http.Request {

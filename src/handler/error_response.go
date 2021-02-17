@@ -10,11 +10,11 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-func HandleErrorResponse(writer http.ResponseWriter, responseError *ApiResponseError) {
-	writer.WriteHeader(responseError.Code)
+func HandleErrorResponse(writer http.ResponseWriter, responseError interface{ApiResponseErrorInterface}) {
+	writer.WriteHeader(responseError.GetCode())
 	json.NewEncoder(writer).Encode(
 		ErrorResponse{
-			Code: responseError.Code,
+			Code: responseError.GetCode(),
 			Message: responseError.Error(),
 		})
 }

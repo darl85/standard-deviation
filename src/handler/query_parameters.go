@@ -5,14 +5,21 @@ import (
 	"strconv"
 )
 
-// TODO convert to interface to hide fields
+type ApiResponseErrorInterface interface {
+	GetCode() int
+	Error() string
+}
+
 type ApiResponseError struct {
-	Code    int
-	Message string
+	code    int
+	message string
 }
 
 func (error *ApiResponseError) Error() string {
-	return error.Message
+	return error.message
+}
+func (error *ApiResponseError) GetCode() int {
+	return error.code
 }
 
 func HandleQueryParameters(request *http.Request) (int, int, *ApiResponseError) {
@@ -21,15 +28,15 @@ func HandleQueryParameters(request *http.Request) (int, int, *ApiResponseError) 
 
 	if requestsParamError != nil || lengthParamError != nil {
 		return 0, 0, &ApiResponseError{
-			Code:    http.StatusBadRequest,
-			Message: "Parameters are invalid, pass integers for both params",
+			code:    http.StatusBadRequest,
+			message: "Parameters are invalid, pass integers for both params",
 		}
 	}
 
 	if requests < 0 || numberOfIntegers < 0 {
 		return 0, 0, &ApiResponseError{
-			Code:    http.StatusBadRequest,
-			Message: "Parameters cannot be negative",
+			code:    http.StatusBadRequest,
+			message: "Parameters cannot be negative",
 		}
 	}
 

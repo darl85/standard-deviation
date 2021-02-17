@@ -7,15 +7,6 @@ import (
 	"testing"
 )
 
-type calculateStandardDeviationMock struct {
-	mock.Mock
-}
-
-func (m *calculateStandardDeviationMock) calculateStandardDeviation(numberSet []int) float64 {
-	args := m.Called(numberSet)
-	return float64(args.Int(0))
-}
-
 func TestReturnCalculationsForEachSetAndSum(t *testing.T) {
 	firstNumbersCollection := []int{1,4,5,10,12}
 	secondNumbersCollection := []int{15,14,25,55,66}
@@ -47,4 +38,13 @@ func TestReturnCalculationsForEachSetAndSum(t *testing.T) {
 	calcMock.On("calculateStandardDeviation", sumNumbersCollection).Return(int(expectedStdDev))
 
 	assert.Equal(t, expectedData, GetStandardDeviations(data, calcMock))
+}
+
+type calculateStandardDeviationMock struct {
+	mock.Mock
+}
+
+func (m *calculateStandardDeviationMock) calculateStandardDeviation(numberSet []int) float64 {
+	args := m.Called(numberSet)
+	return float64(args.Int(0))
 }

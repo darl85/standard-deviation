@@ -32,8 +32,8 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 
 	if apiError != nil {
 		return nil, &ClientError{
-			code:    http.StatusInternalServerError,
-			message: apiError.Error(),
+			Code:    http.StatusInternalServerError,
+			Message: apiError.Error(),
 		}
 	}
 	if response != nil && response.Error != nil {
@@ -45,8 +45,8 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 			code = response.Error.Code
 		}
 		return nil, &ClientError{
-			code:    code,
-			message: response.Error.Message,
+			Code:    code,
+			Message: response.Error.Message,
 		}
 	}
 
@@ -58,8 +58,8 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 	gettingObjectError := response.GetObject(&result)
 	if gettingObjectError != nil {
 		return nil, &ClientError{
-			code:    http.StatusInternalServerError,
-			message: gettingObjectError.Error(),
+			Code:    http.StatusInternalServerError,
+			Message: gettingObjectError.Error(),
 		}
 	}
 
@@ -83,13 +83,13 @@ type apiResult struct {
 }
 
 type ClientError struct {
-	code    int
-	message string
+	Code    int
+	Message string
 }
 
 func (clientError *ClientError) Error() string {
-	return clientError.message
+	return clientError.Message
 }
 func (clientError *ClientError) GetCode() int {
-	return clientError.code
+	return clientError.Code
 }

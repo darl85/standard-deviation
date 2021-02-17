@@ -33,8 +33,8 @@ func TestApiErrorFromClientCall(t *testing.T) {
 	apiError := errors.New("some api error")
 	apiCallParams := &apiParams{"some api key", 3, 1,3}
 	expectedError := &ClientError{
-		code:    http.StatusInternalServerError,
-		message: apiError.Error(),
+		Code:    http.StatusInternalServerError,
+		Message: apiError.Error(),
 	}
 
 	clientMock := prepareMockWithApiError(apiCallParams, apiError)
@@ -67,8 +67,8 @@ func TestRpcResponseApiErrorFromClientCall(t *testing.T) {
 				Data:    nil,
 			},
 			expectedClientError : &ClientError{
-				code:    666,
-				message: "some internal error",
+				Code:    666,
+				Message: "some internal error",
 			},
 		},
 		{
@@ -78,8 +78,8 @@ func TestRpcResponseApiErrorFromClientCall(t *testing.T) {
 				Data:    nil,
 			},
 			expectedClientError : &ClientError{
-				code:    500,
-				message: "some internal error sourced in negative error code",
+				Code:    500,
+				Message: "some internal error sourced in negative error code",
 			},
 		},
 	}

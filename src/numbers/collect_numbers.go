@@ -2,7 +2,9 @@ package numbers
 
 import (
 	"context"
+	"standard-deviation/src/random_api"
 	"sync"
+	"time"
 )
 
 type RandomApiClientInterface interface {
@@ -13,6 +15,7 @@ func CollectNumberSets(
 	requests int,
 	numberOfIntegers int,
 	randomApiClient RandomApiClientInterface,
+	timeout time.Duration,
 ) (
 	[][]int,
 	error,
@@ -21,7 +24,7 @@ func CollectNumberSets(
 	var numbersSetsCollection [][]int
 	var apiError error
 
-	randomApiContext, cancel := context.WithCancel(context.Background())
+	randomApiContext, cancel := context.WithTimeout(context.Background(), timeout)
 
 	// TODO possibilities to refactor ?
 	for i := 0; i < requests; i++ {
@@ -30,7 +33,16 @@ func CollectNumberSets(
 			numbers, err := getNumbersSet(randomApiContext, numberOfIntegers, randomApiClient)
 			if err != nil {
 				cancel()
-				apiError = err
+
+				if assertError, ok := err.(*random_api.ClientError); ok {
+					apiError = &CollectingNumbersError{
+						code:    assertError.GetCode(),
+						message: assertError.Error(),
+					}
+				} else {
+					apiError = err
+				}
+
 				numbersSetsCollection = nil
 			} else {
 				numbersSetsCollection = append(numbersSetsCollection, numbers)

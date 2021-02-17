@@ -6,7 +6,11 @@ import (
 )
 
 type StandardDeviation struct {
-	StdDev int `json:"StdDev"`
+	StdDev float64 `json:"StdDev"`
 	Data   []int  `json:"Data"`
 }
 
+func HandleSuccessResponse(writer http.ResponseWriter, deviations []StandardDeviation) {
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(deviations)
+}

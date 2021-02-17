@@ -9,34 +9,29 @@ import (
     "standard-deviation/src/random_api"
 )
 
-type ApiResponseError struct {
-    code    int
-    message string
-}
-
-func (responseError *ApiResponseError) Error() string {
-    return responseError.message
-}
-func (responseError *ApiResponseError) GetCode() int {
-    return responseError.code
-}
-
 func meanHandler(writer http.ResponseWriter, request *http.Request) {
     writer.Header().Set("Content-Type", "application/json")
 
     requests, numberOfIntegers, paramsValidationError := handler.HandleQueryParameters(request)
 
     if paramsValidationError != nil {
-        handler.HandleErrorResponse(writer, paramsValidationError)
+        if assertErr, ok := paramsValidationError.(*handler.ApiResponseError); ok {
+            handler.HandleErrorResponse(writer, &handler.ErrorResponse{
+                Code:    assertErr.GetCode(),
+                Message: assertErr.Error(),
+            })
+        }
         return
     }
 
     numberSetsCollection, collectNumberError := numbers.CollectNumberSets(requests, numberOfIntegers, random_api.RandomApiClient)
     if collectNumberError != nil {
-        handler.HandleErrorResponse(writer, &ApiResponseError{
-            code:    collectNumberError.GetCode(),
-            message: collectNumberError.Error(),
-        })
+        if assertcollectNumberError, ok := collectNumberError.(*random_api.ClientError); ok {
+            handler.HandleErrorResponse(writer, &handler.ErrorResponse{
+                Code:    assertcollectNumberError.GetCode(),
+                Message: assertcollectNumberError.Error(),
+            })
+        }
         return
     }
 

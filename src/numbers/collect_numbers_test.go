@@ -57,8 +57,7 @@ type randomApiClientMock struct {
 	mock.Mock
 }
 
-func (m *randomApiClientMock) GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, interface{ClientErrorInterface}) {
-	var apiError interface{ClientErrorInterface}
+func (m *randomApiClientMock) GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, error) {
 	var numbersSet []int
 	args := m.Called(numberOfIntegers, min, max)
 
@@ -68,11 +67,5 @@ func (m *randomApiClientMock) GetRandomIntegers(numberOfIntegers int, min int, m
 		numbersSet = args.Get(0).([]int)
 	}
 
-	if args.Get(1) == nil {
-		apiError = nil
-	} else {
-		apiError = args.Get(1).(interface{ClientErrorInterface})
-	}
-
-	return numbersSet, apiError
+	return numbersSet, args.Error(1)
 }

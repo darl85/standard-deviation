@@ -5,11 +5,6 @@ import (
 	"strconv"
 )
 
-type ApiResponseErrorInterface interface {
-	GetCode() int
-	Error() string
-}
-
 type ApiResponseError struct {
 	code    int
 	message string
@@ -22,7 +17,7 @@ func (error *ApiResponseError) GetCode() int {
 	return error.code
 }
 
-func HandleQueryParameters(request *http.Request) (int, int, *ApiResponseError) {
+func HandleQueryParameters(request *http.Request) (int, int, error) {
 	requests, requestsParamError := strconv.Atoi(request.URL.Query().Get("requests"))
 	numberOfIntegers, lengthParamError := strconv.Atoi(request.URL.Query().Get("length"))
 

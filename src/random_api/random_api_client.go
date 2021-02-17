@@ -19,15 +19,11 @@ type randomApiClient struct{
 	apiKey string
 }
 
-type RandomApiClientInterface interface {
-	GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, interface{ clientErrorInterface })
-}
-
 type CallableClientInterface interface {
 	Call(method string, params ...interface{}) (*jsonrpc.RPCResponse, error)
 }
 
-func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, interface{ clientErrorInterface }) {
+func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, error) {
 	rpcClient := client.rpcClient
 	response, apiError := rpcClient.Call(
 		"generateIntegers",
@@ -35,7 +31,7 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 	)
 
 	if apiError != nil {
-		return nil, &clientError{
+		return nil, &ClientError{
 			code:    http.StatusInternalServerError,
 			message: apiError.Error(),
 		}
@@ -48,7 +44,7 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 		} else {
 			code = response.Error.Code
 		}
-		return nil, &clientError{
+		return nil, &ClientError{
 			code:    code,
 			message: response.Error.Message,
 		}
@@ -61,7 +57,7 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 
 	gettingObjectError := response.GetObject(&result)
 	if gettingObjectError != nil {
-		return nil, &clientError{
+		return nil, &ClientError{
 			code:    http.StatusInternalServerError,
 			message: gettingObjectError.Error(),
 		}
@@ -86,19 +82,14 @@ type apiResult struct {
 	Random apiRandomResult
 }
 
-type clientError struct {
+type ClientError struct {
 	code    int
 	message string
 }
 
-type clientErrorInterface interface {
-	Error() string
-	GetCode() int
+func (clientError *ClientError) Error() string {
+	return clientError.message
 }
-
-func (error *clientError) Error() string {
-	return error.message
-}
-func (error *clientError) GetCode() int {
-	return error.code
+func (clientError *ClientError) GetCode() int {
+	return clientError.code
 }

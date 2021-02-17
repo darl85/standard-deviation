@@ -5,13 +5,8 @@ import (
 	"sync"
 )
 
-type ClientErrorInterface interface {
-	Error() string
-	GetCode() int
-}
-
 type RandomApiClientInterface interface {
-	GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, interface{ClientErrorInterface})
+	GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, error)
 }
 
 func CollectNumberSets(
@@ -20,11 +15,11 @@ func CollectNumberSets(
 	randomApiClient RandomApiClientInterface,
 ) (
 	[][]int,
-	ClientErrorInterface,
+	error,
 ) {
 	var apiResponseWaitGroup sync.WaitGroup
 	var numbersSetsCollection [][]int
-	var apiError ClientErrorInterface
+	var apiError error
 
 	randomApiContext, cancel := context.WithCancel(context.Background())
 

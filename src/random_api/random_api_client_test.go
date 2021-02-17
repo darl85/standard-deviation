@@ -32,7 +32,7 @@ func TestReturnCorrectnessCallingRpcClientWithSuccess(t *testing.T) {
 func TestApiErrorFromClientCall(t *testing.T) {
 	apiError := errors.New("some api error")
 	apiCallParams := &apiParams{"some api key", 3, 1,3}
-	expectedError := &clientError{
+	expectedError := &ClientError{
 		code:    http.StatusInternalServerError,
 		message: apiError.Error(),
 	}
@@ -58,7 +58,7 @@ func TestRpcResponseApiErrorFromClientCall(t *testing.T) {
 
 	var testData = []struct{
 		rpcApiError *jsonrpc.RPCError
-		expectedClientError *clientError
+		expectedClientError *ClientError
 	}{
 		{
 			rpcApiError: &jsonrpc.RPCError{
@@ -66,7 +66,7 @@ func TestRpcResponseApiErrorFromClientCall(t *testing.T) {
 				Message: "some internal error",
 				Data:    nil,
 			},
-			expectedClientError : &clientError{
+			expectedClientError : &ClientError{
 				code:    666,
 				message: "some internal error",
 			},
@@ -77,7 +77,7 @@ func TestRpcResponseApiErrorFromClientCall(t *testing.T) {
 				Message: "some internal error sourced in negative error code",
 				Data:    nil,
 			},
-			expectedClientError : &clientError{
+			expectedClientError : &ClientError{
 				code:    500,
 				message: "some internal error sourced in negative error code",
 			},

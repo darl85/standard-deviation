@@ -6,15 +6,22 @@ import (
 )
 
 type ErrorResponse struct {
-	Code    int `json:"code"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
-func HandleErrorResponse(writer http.ResponseWriter, responseError interface{ApiResponseErrorInterface}) {
+func (error *ErrorResponse) Error() string {
+	return error.Message
+}
+func (error *ErrorResponse) GetCode() int {
+	return error.Code
+}
+
+func HandleErrorResponse(writer http.ResponseWriter, responseError *ErrorResponse) {
 	writer.WriteHeader(responseError.GetCode())
 	json.NewEncoder(writer).Encode(
 		ErrorResponse{
-			Code: responseError.GetCode(),
+			Code:    responseError.GetCode(),
 			Message: responseError.Error(),
 		})
 }

@@ -28,7 +28,7 @@ func CollectNumberSets(
 
 	for i := 0; i < requests; i++ {
 		apiResponseWaitGroup.Add(1)
- 		go getNumbersSet(
+		go getNumbersSet(
 			randomApiContext,
 			numberOfIntegers,
 			randomApiClient,

@@ -2,13 +2,10 @@ package numbers
 
 import (
 	"context"
+	"standard-deviation/src/random_api"
 	"sync"
 	"time"
 )
-
-type RandomApiClientInterface interface {
-	GetRandomIntegers(numberOfIntegers int, min int, max int) ([]int, error)
-}
 
 func CollectNumberSets(
 	requests int,
@@ -20,8 +17,7 @@ func CollectNumberSets(
 	error,
 ) {
 	var apiResponseWaitGroup sync.WaitGroup
-	var numbersSetsCollection [][]int
-	var apiError error
+	var clientResponse clientResponse
 
 	randomApiContext, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -32,14 +28,23 @@ func CollectNumberSets(
 			randomApiContext,
 			numberOfIntegers,
 			randomApiClient,
-			cancel,
-			&numbersSetsCollection,
-			&apiError,
+			&clientResponse,
 			&apiResponseWaitGroup,
 		)
 	}
 
 	apiResponseWaitGroup.Wait()
 
-	return numbersSetsCollection, apiError
+	if clientResponse.clientError != nil {
+		if assertError, ok := clientResponse.clientError.(*random_api.ClientError); ok {
+			return nil, &CollectingNumbersError{
+				code:    assertError.GetCode(),
+				message: assertError.Error(),
+			}
+		} else {
+			return nil, clientResponse.clientError
+		}
+	}
+
+	return clientResponse.clientResult, nil
 }

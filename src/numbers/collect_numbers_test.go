@@ -19,7 +19,7 @@ func TestNumberSetsCollecting(t *testing.T) {
 	randomApiMock.On("GetRandomIntegers", numOfIntegers, 1, 100).Return(responseNumberSets[0], nil).Once()
 	randomApiMock.On("GetRandomIntegers", numOfIntegers, 1, 100).Return(responseNumberSets[1], nil).Once()
 
-	result, _ := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Duration(time.Second*30))
+	result, _ := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Second*30)
 
 	assert.Equal(t, responseNumberSets, result)
 }
@@ -43,21 +43,22 @@ func TestNumberSetsCollectingFailFromClient(t *testing.T) {
 		},
 	).Once()
 
-	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Duration(time.Second*30))
+	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, randomApiMock, time.Second*30)
 
 	assert.Nil(t, result)
 	assert.NotNil(t, apiError)
 }
 
+// TODO silly test, check how to deal with time related tests
 func TestNumberSetsCollectingFailOnTimeout(t *testing.T) {
 	numOfRequests := 2
 	numOfIntegers := 3
 
-	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, &fakedClient{}, time.Duration(time.Microsecond*1))
+	result, apiError := CollectNumberSets(numOfRequests, numOfIntegers, &fakedClient{}, time.Microsecond*1)
 
 	assert.Nil(t, result)
 	assert.NotNil(t, apiError)
-	assert.Equal(t, "Reqeust timeout exceeded:", apiError.Error())
+	assert.Equal(t, "Request timeout exceeded", apiError.Error())
 }
 
 type fakedClient struct {}

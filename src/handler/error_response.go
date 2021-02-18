@@ -5,18 +5,6 @@ import (
 	"net/http"
 )
 
-type ErrorResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-func (error *ErrorResponse) Error() string {
-	return error.Message
-}
-func (error *ErrorResponse) GetCode() int {
-	return error.Code
-}
-
 func HandleErrorResponse(writer http.ResponseWriter, responseError *ErrorResponse) {
 	writer.WriteHeader(responseError.GetCode())
 	json.NewEncoder(writer).Encode(

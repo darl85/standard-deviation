@@ -3,33 +3,41 @@ package numbers
 import (
 	"context"
 	"net/http"
+	"sync"
+	"time"
 )
 
-type CollectingNumbersError struct {
-	code    int
-	message string
-}
-
-func (timeoutError *CollectingNumbersError) Error() string {
-	return timeoutError.message
-}
-func (timeoutError *CollectingNumbersError) GetCode() int {
-	return timeoutError.code
-}
+const singleQueryTimeout = 800 * time.Millisecond
 
 func getNumbersSet(
 	randomApiContext context.Context,
 	numberOfIntegers int,
 	randomApiClient RandomApiClientInterface,
-) ([]int, error) {
-	select {
-		case <- randomApiContext.Done():
-			return nil, &CollectingNumbersError{
-				code:    http.StatusRequestTimeout,
-				message: "Reqeust timeout exceeded:",
-			}
-		default:
-	}
+	clientResponseResult *clientResponse,
+	apiResponseWaitGroup *sync.WaitGroup,
+) {
+	singleQueryCtx, singleQueryCancel := context.WithTimeout(randomApiContext, singleQueryTimeout)
+	defer singleQueryCancel()
+	defer apiResponseWaitGroup.Done()
 
-	return randomApiClient.GetRandomIntegers(numberOfIntegers, 1, 100)
+	clientResponseChannel := make(chan singleClientResponse)
+
+	go func() {
+		result, clientError := randomApiClient.GetRandomIntegers(numberOfIntegers, 1, 100)
+		clientResponseChannel <- singleClientResponse{result, clientError}
+	}()
+
+	select {
+	case clientResponse := <-clientResponseChannel:
+		clientResponseResult.clientResult = append(clientResponseResult.clientResult, clientResponse.clientResult)
+		clientResponseResult.clientError = clientResponse.clientError
+	case <-singleQueryCtx.Done():
+		*clientResponseResult = clientResponse{
+			nil,
+			&CollectingNumbersError{
+				code:    http.StatusInternalServerError,
+				message: "Request timeout exceeded",
+			},
+		}
+	}
 }

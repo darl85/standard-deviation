@@ -22,4 +22,4 @@ To build development docker image application :
 You need obtain random api key from https://www.random.org/
 To run development application provide proper .env.local basing on .env file
 
-``docker run --name standard-deviation-dev -it --rm -p 8080:8080 standard-deviation-dev --env-file .env.local`` 
+``docker run --env-file .env.local --name standard-deviation-dev -it --rm -p 8080:8080 standard-deviation-dev`` 

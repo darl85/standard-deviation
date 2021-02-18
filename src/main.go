@@ -18,8 +18,8 @@ func meanHandler(writer http.ResponseWriter, request *http.Request) {
     requests, numberOfIntegers, paramsValidationError := handler.HandleQueryParameters(request)
 
     if paramsValidationError != nil {
-        if assertErr, ok := paramsValidationError.(*handler.ErrorResponse); ok {
-            handler.HandleErrorResponse(writer, &handler.ErrorResponse{
+        if assertErr, ok := paramsValidationError.(*handler.ResponseError); ok {
+            handler.HandleErrorResponse(writer, &handler.ResponseError{
                 Code:    assertErr.GetCode(),
                 Message: assertErr.Error(),
             })
@@ -37,7 +37,7 @@ func meanHandler(writer http.ResponseWriter, request *http.Request) {
     )
     if collectNumberError != nil {
         if assertCollectNumberError, ok := collectNumberError.(*numbers.CollectingNumbersError); ok {
-            handler.HandleErrorResponse(writer, &handler.ErrorResponse{
+            handler.HandleErrorResponse(writer, &handler.ResponseError{
                 Code:    assertCollectNumberError.GetCode(),
                 Message: assertCollectNumberError.Error(),
             })

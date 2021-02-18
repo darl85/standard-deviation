@@ -18,7 +18,7 @@ func meanHandler(writer http.ResponseWriter, request *http.Request) {
     requests, numberOfIntegers, paramsValidationError := handler.HandleQueryParameters(request)
 
     if paramsValidationError != nil {
-        if assertErr, ok := paramsValidationError.(*handler.ApiResponseError); ok {
+        if assertErr, ok := paramsValidationError.(*handler.ErrorResponse); ok {
             handler.HandleErrorResponse(writer, &handler.ErrorResponse{
                 Code:    assertErr.GetCode(),
                 Message: assertErr.Error(),

@@ -27,7 +27,7 @@ func TestReturningErrorOnConversion(t *testing.T) {
 
 	_, _, handlerError := HandleQueryParameters(request)
 
-	assertErr, _ := handlerError.(*ApiResponseError)
+	assertErr, _ := handlerError.(*ErrorResponse)
 
 	assert.Equal(t, http.StatusBadRequest, assertErr.GetCode())
 	assert.Equal(t, "Parameters are invalid, pass integers for both params", assertErr.Error())
@@ -37,7 +37,7 @@ func TestReturningErrorOnNegativeParamValue(t *testing.T) {
 	request := prepareRequest("-2", "8")
 
 	_, _, handlerError := HandleQueryParameters(request)
-	assertErr, _ := handlerError.(*ApiResponseError)
+	assertErr, _ := handlerError.(*ErrorResponse)
 
 	assert.Equal(t, http.StatusBadRequest, assertErr.GetCode())
 	assert.Equal(t, "Parameters cannot be negative", assertErr.Error())

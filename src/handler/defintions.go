@@ -1,14 +1,14 @@
 package handler
 
 
-type ErrorResponse struct {
+type ResponseError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
-func (error *ErrorResponse) Error() string {
-	return error.Message
+func (errorResponse *ResponseError) Error() string {
+	return errorResponse.Message
 }
-func (error *ErrorResponse) GetCode() int {
-	return error.Code
+func (errorResponse *ResponseError) GetCode() int {
+	return errorResponse.Code
 }

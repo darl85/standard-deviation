@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-func HandleErrorResponse(writer http.ResponseWriter, responseError *ErrorResponse) {
+func HandleErrorResponse(writer http.ResponseWriter, responseError *ResponseError) {
 	writer.WriteHeader(responseError.GetCode())
 	json.NewEncoder(writer).Encode(
-		ErrorResponse{
+		ResponseError{
 			Code:    responseError.GetCode(),
 			Message: responseError.Error(),
 		})
@@ -17,7 +17,7 @@ func HandleErrorResponse(writer http.ResponseWriter, responseError *ErrorRespons
 func HandleUnexpectedErrorResponse(writer http.ResponseWriter) {
 	writer.WriteHeader(http.StatusInternalServerError)
 	json.NewEncoder(writer).Encode(
-		ErrorResponse{
+		ResponseError{
 			Code:    http.StatusInternalServerError,
 			Message: "Unexpected error",
 		})

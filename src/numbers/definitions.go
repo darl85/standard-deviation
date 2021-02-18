@@ -10,11 +10,11 @@ type CollectingNumbersError struct {
 	message string
 }
 
-func (timeoutError *CollectingNumbersError) Error() string {
-	return timeoutError.message
+func (numbersError *CollectingNumbersError) Error() string {
+	return numbersError.message
 }
-func (timeoutError *CollectingNumbersError) GetCode() int {
-	return timeoutError.code
+func (numbersError *CollectingNumbersError) GetCode() int {
+	return numbersError.code
 }
 
 type clientResponse struct{

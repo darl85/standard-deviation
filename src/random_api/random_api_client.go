@@ -37,13 +37,11 @@ func (client *randomApiClient) GetRandomIntegers(numberOfIntegers int, min int, 
 		}
 	}
 	if response != nil && response.Error != nil {
-		var code int
-		if response.Error.Code < 0 {
-			// TODO dubious - https://api.random.org/json-rpc/2/error-codes can be mapped more strictly
-			code = http.StatusInternalServerError
-		} else {
+		code := http.StatusInternalServerError
+		if response.Error.Code > 0 {
 			code = response.Error.Code
 		}
+
 		return nil, &ClientError{
 			Code:    code,
 			Message: response.Error.Message,

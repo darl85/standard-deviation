@@ -10,7 +10,7 @@ import (
     "time"
 )
 
-const timeout = time.Duration(time.Second*30)
+const timeout = 2 * time.Second
 
 func meanHandler(writer http.ResponseWriter, request *http.Request) {
     writer.Header().Set("Content-Type", "application/json")

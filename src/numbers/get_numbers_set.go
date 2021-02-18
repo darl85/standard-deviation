@@ -3,7 +3,12 @@ package numbers
 import (
 	"context"
 	"net/http"
+	"standard-deviation/src/random_api"
+	"sync"
+	"time"
 )
+
+const singleQueryTimeout = 600 * time.Millisecond
 
 type CollectingNumbersError struct {
 	code    int
@@ -21,15 +26,46 @@ func getNumbersSet(
 	randomApiContext context.Context,
 	numberOfIntegers int,
 	randomApiClient RandomApiClientInterface,
-) ([]int, error) {
+	cancel context.CancelFunc,
+	numbersSetsCollection *[][]int,
+	apiError *error,
+	apiResponseWaitGroup *sync.WaitGroup,
+) {
+	singleQueryCtx, singleQueryCancel := context.WithTimeout(randomApiContext, singleQueryTimeout)
+	defer singleQueryCancel()
+
+	singleResultChannel := make(chan []int)
+	errorChannel := make(chan error)
+
+	go func(singleResultChannel chan []int, errorChannel chan error) {
+		result, clientError := randomApiClient.GetRandomIntegers(numberOfIntegers, 1, 100)
+		singleResultChannel <- result
+		errorChannel <- clientError
+	}(singleResultChannel, errorChannel)
+
 	select {
-		case <- randomApiContext.Done():
-			return nil, &CollectingNumbersError{
-				code:    http.StatusRequestTimeout,
-				message: "Reqeust timeout exceeded:",
+	case singleNumberSet := <-singleResultChannel:
+		*numbersSetsCollection = append(*numbersSetsCollection, singleNumberSet)
+	case clientError := <-errorChannel:
+		if clientError != nil {
+			if assertError, ok := clientError.(*random_api.ClientError); ok {
+				*apiError = &CollectingNumbersError{
+					code:    assertError.GetCode(),
+					message: assertError.Error(),
+				}
+			} else {
+				*apiError = clientError
 			}
-		default:
+
+			*numbersSetsCollection = nil
+			cancel()
+		}
+	case <-singleQueryCtx.Done():
+		*apiError = &CollectingNumbersError{
+			code:    http.StatusInternalServerError,
+			message: singleQueryCtx.Err().Error(),
+		}
 	}
 
-	return randomApiClient.GetRandomIntegers(numberOfIntegers, 1, 100)
+	apiResponseWaitGroup.Done()
 }
